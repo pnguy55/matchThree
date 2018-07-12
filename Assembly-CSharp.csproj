@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\GameBoard.cs" />
+    <Compile Include="Assets\Scripts\GamePiece.cs" />
     <Compile Include="Assets\Scripts\Tile.cs" />
     <Reference Include="UnityEditor.StandardEvents">
       <HintPath>C:/Users/pnguy/OneDrive/Desktop/Google Drive/UNITY PROJECTS/MatchThree/Library/ScriptAssemblies/UnityEditor.StandardEvents.dll</HintPath>
