@@ -12,6 +12,9 @@ public class GameBoard : MonoBehaviour {
     public GameObject tilePrefab;
     public GameObject[] gamePiecePrefabs;
 
+    //adjust speed of movement
+    public float swapTime = 0.5f;
+
     //Declares a 2d array.  The comma indicates the existance of
     //another dimension in the array
     Tile[,] m_allTiles;
@@ -101,17 +104,8 @@ public class GameBoard : MonoBehaviour {
         return gamePiecePrefabs[randomIdx];
     }
 
-    internal bool DragToTile(GamePiece gamePiece)
-    {
-        throw new NotImplementedException();
-    }
 
-    internal void ClickTile(GamePiece gamePiece)
-    {
-        throw new NotImplementedException();
-    }
-
-    void PlaceGamePiece(GamePiece gamePiece, int x, int y)
+    public void PlaceGamePiece(GamePiece gamePiece, int x, int y)
     {
         //If gamePiece is invalid, it barks at you1
         if(gamePiece == null)
@@ -124,10 +118,23 @@ public class GameBoard : MonoBehaviour {
         gamePiece.transform.position = new Vector3(x, y, 0);
         gamePiece.transform.rotation = Quaternion.identity;
 
+        //Update the correct element of the 2d array.
+        if (IsWithinBounds(x, y))
+        {
+            m_allGamePieces[x, y] = gamePiece;
+        }
+        gamePiece.SetCoord(x, y);
+        
+
         //Sends position to GamePiece class to store that data.
         gamePiece.SetCoord(x, y);
     }
 
+    bool IsWithinBounds(int x, int y)
+    {
+        //Ensures that the x and y are within bounds of array
+        return (x >= 0 && x < width && y >= 0 && y < height);
+    }
     void FillRandom()
     {
         /*Utilizes double loop to populate a 2d array to place gamePieces
@@ -144,9 +151,11 @@ public class GameBoard : MonoBehaviour {
                 
                 if(randomPiece != null)
                 {
+                    randomPiece.GetComponent<GamePiece>().Init(this);
                     //Passes GamePiece and coordinates to PlaceGamePiece function to populate board
                     //one by one.
                     PlaceGamePiece(randomPiece.GetComponent<GamePiece>(), i, j);
+                    randomPiece.transform.parent = transform;
                 }
             }
         }
@@ -163,7 +172,7 @@ public class GameBoard : MonoBehaviour {
 
     public void DragToTile(Tile tile)
     {
-        if (m_clickedTile != null)
+        if (m_clickedTile != null && IsNextTo(tile, m_clickedTile))
         {
             m_targetTile = tile;
         }
@@ -173,18 +182,37 @@ public class GameBoard : MonoBehaviour {
     {
         if (m_clickedTile != null && m_targetTile != null)
         {
-
+            SwitchTiles(m_clickedTile, m_targetTile);
         }
+
+        m_clickedTile = null;
+        m_targetTile = null;
+
     }
 
     void SwitchTiles(Tile clickedTile, Tile targetTile)
     {
-
+        GamePiece clickedPiece = m_allGamePieces[clickedTile.xIndex, clickedTile.yIndex];
+        GamePiece targetPiece = m_allGamePieces[targetTile.xIndex, targetTile.yIndex];
         //add code to switch corresponding Gamepieces
 
-        m_clickedTile = null;
-        m_targetTile = null;
+        clickedPiece.Move(targetTile.xIndex, targetTile.yIndex, swapTime);
+        targetPiece.Move(clickedTile.xIndex, clickedTile.yIndex, swapTime);
     }
 
+    bool IsNextTo(Tile start, Tile end)
+    {
+        if (Mathf.Abs(start.xIndex - end.xIndex) == 1 && start.yIndex == end.yIndex)
+        {
+            return true;
+        }
+
+        if (Mathf.Abs(start.yIndex - end.xIndex) == 1 && start.xIndex == end.xIndex)
+        {
+            return true;
+        }
+
+        return false;
+    }
 
 }
