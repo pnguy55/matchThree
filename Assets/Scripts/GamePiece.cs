@@ -9,6 +9,18 @@ public class GamePiece : MonoBehaviour {
 
     bool m_isMoving = false;
 
+    public InterpType interpolation = InterpType.SmootherStep;
+
+    public enum InterpType
+    {
+        Linear,
+        EaseOut,
+        EaseIn,
+        SmoothStep,
+        SmootherStep
+    };
+
+
 	// Use this for initialization
 	void Start () {
 		
@@ -19,12 +31,12 @@ public class GamePiece : MonoBehaviour {
     {
 		if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            Move((int)transform.position.x + 1, (int) transform.position.y, 0.5f);
+            Move((int)transform.position.x + 2, (int) transform.position.y, 0.5f);
         }
 
         if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            Move((int)transform.position.x - 1, (int)transform.position.y, 0.5f);
+            Move((int)transform.position.x - 2, (int)transform.position.y, 0.5f);
         }
     }
     public void SetCoord(int x, int y)
@@ -66,6 +78,30 @@ public class GamePiece : MonoBehaviour {
             elapsedTime += Time.deltaTime;
 
             float t = Mathf.Clamp(elapsedTime / timeToMove, 0f, 1f);
+
+            switch (interpolation)
+            {
+                case InterpType.Linear:
+                    break;
+                case InterpType.EaseOut:
+                    t = Mathf.Sin(t * Mathf.PI * 0.5f);
+                    break;
+                case InterpType.EaseIn:
+                    t = 1 - Mathf.Cos(t * Mathf.PI * 0.5f);
+                    break;
+                case InterpType.SmoothStep:
+                    t = t * t * (3 - 2 * t);
+                    break;
+                case InterpType.SmootherStep:
+                    t = t * t * t * (t * (6 - 15) + 10);
+                    break;
+            }
+
+
+            //
+            //
+            //
+            
 
             transform.position = Vector3.Lerp(startPosition, destination, t);
 

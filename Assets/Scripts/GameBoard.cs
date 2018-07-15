@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -15,6 +16,9 @@ public class GameBoard : MonoBehaviour {
     //another dimension in the array
     Tile[,] m_allTiles;
     GamePiece[,] m_allGamePieces;
+
+    Tile m_clickedTile;
+    Tile m_targetTile;
 
 	// Use this for initialization
 	void Start () {
@@ -85,7 +89,7 @@ public class GameBoard : MonoBehaviour {
         //Declares an int to choose a random piece from the 
         //gamePiecePrefab array.
         
-        int randomIdx = Random.Range(0, gamePiecePrefabs.Length);
+        int randomIdx = UnityEngine.Random.Range(0, gamePiecePrefabs.Length);
 
         //Defensive programming, if we forget to set the array in the inspector
         //This snippet will catch that and give us an error
@@ -95,6 +99,16 @@ public class GameBoard : MonoBehaviour {
         }
 
         return gamePiecePrefabs[randomIdx];
+    }
+
+    internal bool DragToTile(GamePiece gamePiece)
+    {
+        throw new NotImplementedException();
+    }
+
+    internal void ClickTile(GamePiece gamePiece)
+    {
+        throw new NotImplementedException();
     }
 
     void PlaceGamePiece(GamePiece gamePiece, int x, int y)
@@ -137,4 +151,40 @@ public class GameBoard : MonoBehaviour {
             }
         }
     }
+
+    public void ClickTile(Tile tile)
+    {
+        if (m_clickedTile == null)
+        {
+            m_clickedTile = tile;
+            Debug.Log("clicked tile: " + tile.name);
+        }
+    }
+
+    public void DragToTile(Tile tile)
+    {
+        if (m_clickedTile != null)
+        {
+            m_targetTile = tile;
+        }
+    }
+
+    public void ReleaseTile()
+    {
+        if (m_clickedTile != null && m_targetTile != null)
+        {
+
+        }
+    }
+
+    void SwitchTiles(Tile clickedTile, Tile targetTile)
+    {
+
+        //add code to switch corresponding Gamepieces
+
+        m_clickedTile = null;
+        m_targetTile = null;
+    }
+
+
 }
