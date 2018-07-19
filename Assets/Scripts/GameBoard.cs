@@ -33,7 +33,8 @@ public class GameBoard : MonoBehaviour {
         SetupTiles();
         SetupCamera();
         FillRandom();
-        //HighLightMatches();
+        //ClearPieceAt(3, 5);
+        //ClearPieceAt(5, 6);
     }
 	
 	void SetupTiles()
@@ -219,11 +220,17 @@ public class GameBoard : MonoBehaviour {
                 clickedPiece.Move(clickedTile.xIndex, clickedTile.yIndex, swapTime);
                 targetPiece.Move(targetTile.xIndex, targetTile.yIndex, swapTime);
             }
+            else
+            {
+                yield return new WaitForSeconds(swapTime);
+                ClearPieceAt(clickedPieceMatches);
+                ClearPieceAt(targetPieceMatches);
 
-            yield return new WaitForSeconds(swapTime);
+                //HighLightMatchesAt(clickedTile.xIndex, clickedTile.yIndex);
+                //HighLightMatchesAt(targetTile.xIndex, targetTile.yIndex);
+            }
 
-            HighLightMatchesAt(clickedTile.xIndex, clickedTile.yIndex);
-            HighLightMatchesAt(targetTile.xIndex, targetTile.yIndex);
+            
         }
     }
 
@@ -280,14 +287,22 @@ public class GameBoard : MonoBehaviour {
 
             GamePiece nextPiece = m_allGamePieces[nextX, nextY];
 
-            if (nextPiece.matchValue == startPiece.matchValue && !matches.Contains(nextPiece))
-            {
-                matches.Add(nextPiece);
-            }
-
-            else
+            if (nextPiece == null)
             {
                 break;
+            }
+            else
+            {
+
+                if (nextPiece.matchValue == startPiece.matchValue && !matches.Contains(nextPiece))
+                {
+                    matches.Add(nextPiece);
+                }
+
+                else
+                {
+                    break;
+                }
             }
         }
 
@@ -400,5 +415,38 @@ public class GameBoard : MonoBehaviour {
 
         var combinedMatches = horizMatches.Union(vertMatches).ToList();
         return combinedMatches;
+    }
+
+    void ClearPieceAt(int x, int y)
+    {
+        GamePiece pieceToClear = m_allGamePieces[x, y];
+
+        if (pieceToClear != null)
+        {
+            m_allGamePieces[x, y] = null;
+            Destroy(pieceToClear.gameObject);
+        }
+
+        HighLightTileOff(x, y);
+    }
+
+    void ClearBoard()
+    {
+        for(int i = 0; i < width; i++)
+        {
+            for (int j = 0; j < height; j++)
+            {
+                ClearPieceAt(i, j);
+            }
+        }
+    }
+
+    //OVERLOAD OF CLEARPIECEAT METHOD
+    void ClearPieceAt(List<GamePiece> gamePieces)
+    {
+        foreach (GamePiece piece in gamePieces)
+        {
+            ClearPieceAt(piece.xIndex, piece.yIndex);
+        }
     }
 }
